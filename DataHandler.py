@@ -1,9 +1,13 @@
 from __future__ import division
+from nltk.stem.porter import PorterStemmer
 import csv
 from copy import deepcopy
 import math
 import numpy as np
-
+import codecs
+import sys
+reload(sys)
+sys.setdefaultencoding('utf8')
 
 class DataHandler(object):
     data_set = []
@@ -11,6 +15,8 @@ class DataHandler(object):
     data_set_file_name = ""
     prediction_label = ""
     cos_to_ignore = []
+    #http://nlp.stanford.edu/IR-book/html/htmledition/dropping-common-terms-stop-words-1.html
+    #stop_words = ['i', 'he', 'she', 'a', 'an', 'and', 'are', 'as', 'at', 'be', 'by', 'for' ]
 
     def __init__(self, data_set_file_name, prediction_label, cols_to_ignore=[]):
         self.data_set_file_name = data_set_file_name
@@ -46,8 +52,8 @@ class DataHandler(object):
             features.append(tuple(numeric_line))
 
         print "features and prediction array"
-        print features
-        print predictions
+        #print features
+        #print predictions
         print "###########"
 
         return first_line, features, predictions
@@ -92,31 +98,42 @@ class DataHandler(object):
         numeric_lines = [float(num) for num in lines]
         return numeric_lines
 
-    def convert_docs_to_bow(self, documents):
-        terms_in_documents = {}
+    def tokenize(self, document, clean_strategy = 0):
+        if clean_strategy == 1:
+            return document.lower().split()
+        else:
+            return document.lower().split()
 
+    def get_feature_set_for_documents(self, documents):
+        terms_in_documents = {}
         for document in documents:
-            words = document.split()
+            words = self.tokenize(document)
             for word in words:
                 if word not in terms_in_documents:
                     terms_in_documents[word] = 0
 
+        return terms_in_documents.keys()
+
+    def convert_docs_to_bow_for_features(self, documents, all_terms):
+        terms_in_documents = {}
+
+        for term in all_terms:
+            terms_in_documents[term] = 0
+
         tf_documents = []
         count = 0
-
-        # get all terms into an array now, so that we put each term in the list in a fixed order
-        all_terms = terms_in_documents.keys()
 
         # calculate all the term frequencies in all the documents
         for document in documents:
             tf_document = deepcopy(terms_in_documents)
 
             for term in all_terms:
-                doc_words = document.split()
+                doc_words = self.tokenize(document)
                 number_of_words_in_current_document = len(doc_words)
                 tf_document[term] = doc_words.count(term) / number_of_words_in_current_document
 
             count+=1
+
             print "Tf calculated for document: ", count
             tf_documents.append(tf_document)
 
@@ -130,6 +147,7 @@ class DataHandler(object):
         for term in all_terms:
             docs_that_contain_term = [tf_doc for tf_doc in tf_documents if tf_doc[term] > 0]
             number_of_documents_that_contain_word = len(docs_that_contain_term)
+            number_of_documents_that_contain_word = 1 if number_of_documents_that_contain_word == 0 else number_of_documents_that_contain_word
 
             idf_terms[term] = math.log(number_of_documents / number_of_documents_that_contain_word)
 
@@ -150,6 +168,31 @@ class DataHandler(object):
             bow_tfidfs.append(tuple(feature_vec))
 
         return bow_tfidfs
+
+    def convert_sentiment_list_to_number(self, predictions):
+        pred_arr = []
+        for prediction in predictions:
+            pred_val = 1 if prediction == 'POSITIVE' else -1
+            pred_arr.append(pred_val)
+
+        return pred_arr
+
+    def write_to_file(self, file_name, features, headers, predictions):
+
+        csvfile = codecs.open(file_name, 'w', 'utf-8')
+
+        writer = csv.writer(csvfile)
+        writer.writerow(headers)
+        print headers
+
+        for i in range(0, len(features)):
+            feature = list(features[i])
+            feature.append(predictions[i])
+            print len(features[i])
+            #print features
+            writer.writerow(feature)
+
+        csvfile.close()
 
     def print_set_len(self):
         dslen = len(self.features)
