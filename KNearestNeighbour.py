@@ -25,7 +25,7 @@ class KNearestNeighbour(object):
         sorted_data_points = sorted(distances.items(), key = lambda x: x[1][1])
 
         prediction = 0
-        print sorted_data_points
+        #print sorted_data_points
 
         for k in range(0, self.k):
             prediction += sorted_data_points[k][1][0]

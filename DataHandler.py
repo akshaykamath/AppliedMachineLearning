@@ -114,6 +114,7 @@ class DataHandler(object):
 
         return terms_in_documents.keys()
 
+
     def convert_docs_to_bow_for_features(self, documents, all_terms):
         terms_in_documents = {}
 

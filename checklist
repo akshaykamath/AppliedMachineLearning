@@ -1,7 +1,20 @@
 Implement knn - done
 Implement csv to feature-set and prediction data structure conversion for algorithms -data
 Implement TF-IDF for converting textual featurs into numbers as features - done
-Implement file write of feature, prediction, headers for fast input reading
+Implement file write of feature, prediction, headers for fast input reading - done
+Read from csv file and then pass to implemented knn. - done
 Implement Metrics class, which takes in the classifier, train set and test set
 and spits out metrics such as precision, confusion matrics, accuracy and recall
+
 Adapt bagging implementation for knn
+
+More feature engineering TBD:
+1. Remove stop words
+2. Regular expression tokenization instead of simple word tokenization
+3. Word Stemming
+
+
+References:
+For tf-idf: http://www.tfidf.com/
+For Stop words: http://nlp.stanford.edu/IR-book/html/htmledition/dropping-common-terms-stop-words-1.html
+
