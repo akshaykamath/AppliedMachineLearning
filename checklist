@@ -1,0 +1,7 @@
+Implement knn - done
+Implement csv to feature-set and prediction data structure conversion for algorithms -data
+Implement TF-IDF for converting textual featurs into numbers as features - done
+Implement file write of feature, prediction, headers for fast input reading
+Implement Metrics class, which takes in the classifier, train set and test set
+and spits out metrics such as precision, confusion matrics, accuracy and recall
+Adapt bagging implementation for knn
