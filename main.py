@@ -1,6 +1,7 @@
 from KNearestNeighbour import KNearestNeighbour
 from DataHandler import DataHandler
 from EvaluationMetrics import EvaluationMetrics
+from Bagging import Bagging
 
 # Method to test basic KNN implementation with a dummy feature set and predictions set
 def test_stub():
@@ -104,7 +105,8 @@ def test_knn_on_review_data_set():
     print test_prediction_labels[1]
 
 
-def test_evaluation_metrics_class():
+# This is the main method to evaluate knn on the data set.
+def evaluate_knn():
     dh = DataHandler('data/train-set-feature-engineered.csv', 'prediction_label')
     headers, train_features, train_prediction_labels = dh.get_numeric_data_set()
 
@@ -117,10 +119,25 @@ def test_evaluation_metrics_class():
     eval_metrics.evaluate()
 
 
+# This is the main method to evaluate knn on the data set.
+def evaluate_bagged_knn():
+    dh = DataHandler('data/train-set-feature-engineered.csv', 'prediction_label')
+    headers, train_features, train_prediction_labels = dh.get_numeric_data_set()
+
+    bagged_knn = Bagging(train_features, train_prediction_labels, 5, 1)
+
+    dh_test = DataHandler('data/test-set-feature-engineered.csv', 'prediction_label')
+    headers, test_features, test_prediction_labels = dh_test.get_numeric_data_set()
+
+    eval_metrics = EvaluationMetrics(bagged_knn, test_features, test_prediction_labels)
+    eval_metrics.evaluate()
+
 #test_knn_on_review_data_set()
 #data_text_stub()
 
 #data_write_train_stub()
 #data_write_test_stub()
 #test_knn_on_review_data_set()
-test_evaluation_metrics_class()
+#evaluate_knn()
+
+evaluate_bagged_knn()
