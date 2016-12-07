@@ -1,4 +1,6 @@
 from scipy.spatial.distance import cdist
+import numpy as np
+
 
 class KNearestNeighbour(object):
     features = []
@@ -7,8 +9,8 @@ class KNearestNeighbour(object):
     train_set_len = 0
 
     def __init__(self, data_set, prediction_labels, k = 1):
-        self.features = data_set
-        self.prediction_labels = prediction_labels
+        self.features = np.array(data_set)
+        self.prediction_labels = np.array(prediction_labels)
 
         self.train_set_len = len(self.features)
 

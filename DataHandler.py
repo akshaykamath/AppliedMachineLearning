@@ -114,6 +114,52 @@ class DataHandler(object):
 
         return terms_in_documents.keys()
 
+    def get_cross_validation_data_sets(self, k, X, Y):
+
+        cross_val_sets = {}
+
+        NPX = np.array(X)
+        NPY = np.array(Y)
+
+        # split the data into k folds
+        train_list_k_folds = np.array_split(NPX, k)
+
+        # split the labels into k folds
+        train_labels_k_folds = np.array_split(NPY, k)
+
+        for i in range(0, k):
+            # Make a deep copy first then extract the training set and tuning set for this fold
+            k_fold_copy = deepcopy(train_list_k_folds)
+            k_fold_label_copy = deepcopy(train_labels_k_folds)
+
+            tuning_set_object = {}
+
+            tuning_set = k_fold_copy[i].tolist()
+            tuning_set_labels = k_fold_label_copy[i].tolist()
+
+            # create the tuning set object for this fold
+            tuning_set_object["data_points"] = tuning_set
+            tuning_set_object["labels"] = tuning_set_labels
+
+            del(k_fold_copy[i])
+            del (k_fold_label_copy[i])
+
+            train_set = []
+            train_set_label = []
+
+            training_set_object = {}
+            for j in range(0, len(k_fold_copy)):
+                train_set.extend(k_fold_copy[j].tolist())
+                train_set_label.extend(k_fold_label_copy[j].tolist())
+
+            # create the training set object for this iteration
+            training_set_object["data_points"] = train_set
+            training_set_object["labels"] = train_set_label
+
+            # store the training set and tuning set into this fold dictionary
+            cross_val_sets[i] = [training_set_object, tuning_set_object]
+
+        return cross_val_sets
 
     def convert_docs_to_bow_for_features(self, documents, all_terms):
         terms_in_documents = {}

@@ -2,9 +2,12 @@ from KNearestNeighbour import KNearestNeighbour
 from DataHandler import DataHandler
 from EvaluationMetrics import EvaluationMetrics
 from Bagging import Bagging
+from Svm import  Svm
+
 
 # Method to test basic KNN implementation with a dummy feature set and predictions set
 def test_stub():
+    #train _ features
     data_set = [(3, 2), (1,1), (4,4), (7,9), (11, 11)]
     prediction_labels = [1,-1,1,-1,1]
     knn = KNearestNeighbour(data_set, prediction_labels, 1)
@@ -132,12 +135,111 @@ def evaluate_bagged_knn():
     eval_metrics = EvaluationMetrics(bagged_knn, test_features, test_prediction_labels)
     eval_metrics.evaluate()
 
+
+# This is the main method to evaluate knn on the data set.
+def evaluate_svm():
+    dh = DataHandler('data/train-set-feature-engineered.csv', 'prediction_label')
+    headers, train_features, train_prediction_labels = dh.get_numeric_data_set()
+
+    svm = Svm(train_features, train_prediction_labels)
+    svm.train()
+
+    dh_test = DataHandler('data/test-set-feature-engineered.csv', 'prediction_label')
+    headers, test_features, test_prediction_labels = dh_test.get_numeric_data_set()
+
+    eval_metrics = EvaluationMetrics(svm, test_features, test_prediction_labels)
+    eval_metrics.evaluate()
+
+
+def tune_svm_using_10_fold():
+    dh = DataHandler('data/train-set-feature-engineered.csv', 'prediction_label')
+    headers, train_features, train_prediction_labels = dh.get_numeric_data_set()
+    data_sets = dh.get_cross_validation_data_sets(10, train_features, train_prediction_labels)
+
+    accuracy = []
+    for data_set_number in data_sets:
+        data_set = data_sets.get(data_set_number)
+        training_set = data_set[0]
+        tuning_set = data_set[1]
+        train_features = training_set["data_points"]
+        train_prediction_labels = training_set["labels"]
+        test_features = tuning_set["data_points"]
+        test_prediction_labels = tuning_set["labels"]
+
+        svm = Svm(train_features, train_prediction_labels)
+        svm.train()
+        eval_metrics = EvaluationMetrics(svm, test_features, test_prediction_labels)
+        eval = eval_metrics.evaluate()
+        accuracy.append(eval['accuracy'])
+
+    average_accuracy = sum(accuracy) / len(accuracy)
+    print average_accuracy
+
+
+def tune_knn_using_10_fold():
+    dh = DataHandler('data/train-set-feature-engineered.csv', 'prediction_label')
+    headers, train_features, train_prediction_labels = dh.get_numeric_data_set()
+    data_sets = dh.get_cross_validation_data_sets(10, train_features, train_prediction_labels)
+
+    accuracy = []
+    for data_set_number in data_sets:
+        data_set = data_sets.get(data_set_number)
+        training_set = data_set[0]
+        tuning_set = data_set[1]
+        train_features = training_set["data_points"]
+        train_prediction_labels = training_set["labels"]
+        test_features = tuning_set["data_points"]
+        test_prediction_labels = tuning_set["labels"]
+
+        knn = KNearestNeighbour(train_features, train_prediction_labels, 100)
+
+        eval_metrics = EvaluationMetrics(knn, test_features, test_prediction_labels)
+        eval = eval_metrics.evaluate()
+        accuracy.append(eval['accuracy'])
+
+    average_accuracy = sum(accuracy) / len(accuracy)
+    print average_accuracy
+
+
+def tune_bagged_knn_using_10_fold():
+    dh = DataHandler('data/train-set-feature-engineered.csv', 'prediction_label')
+    headers, train_features, train_prediction_labels = dh.get_numeric_data_set()
+    data_sets = dh.get_cross_validation_data_sets(10, train_features, train_prediction_labels)
+
+    accuracy = []
+    for data_set_number in data_sets:
+        data_set = data_sets.get(data_set_number)
+        training_set = data_set[0]
+        tuning_set = data_set[1]
+        train_features = training_set["data_points"]
+        train_prediction_labels = training_set["labels"]
+        test_features = tuning_set["data_points"]
+        test_prediction_labels = tuning_set["labels"]
+
+        bagged_knn = Bagging(train_features, train_prediction_labels, 5, 1)
+
+        eval_metrics = EvaluationMetrics(bagged_knn, test_features, test_prediction_labels)
+        eval = eval_metrics.evaluate()
+        accuracy.append(eval['accuracy'])
+
+    average_accuracy = sum(accuracy) / len(accuracy)
+    print average_accuracy
+
+
+
+
 #test_knn_on_review_data_set()
 #data_text_stub()
 
 #data_write_train_stub()
 #data_write_test_stub()
-#test_knn_on_review_data_set()
-#evaluate_knn()
 
-evaluate_bagged_knn()
+#test_knn_on_review_data_set()
+
+#evaluate_knn()
+#evaluate_bagged_knn()
+#evaluate_svm()
+
+#tune_svm_using_10_fold()
+#tune_knn_using_10_fold()
+#tune_bagged_knn_using_10_fold()
