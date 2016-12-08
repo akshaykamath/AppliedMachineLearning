@@ -141,8 +141,8 @@ def evaluate_svm():
     dh = DataHandler('data/train-set-feature-engineered.csv', 'prediction_label')
     headers, train_features, train_prediction_labels = dh.get_numeric_data_set()
 
-    svm = Svm(train_features, train_prediction_labels, 1)
-    svm.train1()
+    svm = Svm(train_features, train_prediction_labels, 0,1)
+    svm.train()
 
     dh_test = DataHandler('data/test-set-feature-engineered.csv', 'prediction_label')
     headers, test_features, test_prediction_labels = dh_test.get_numeric_data_set()
