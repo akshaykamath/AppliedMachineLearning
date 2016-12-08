@@ -4,6 +4,7 @@ from EvaluationMetrics import EvaluationMetrics
 from Bagging import Bagging
 from Svm import  Svm
 from LogisticRegression import LogisticRegression
+from NaiveBayes import NaiveBayes
 
 # Method to test basic KNN implementation with a dummy feature set and predictions set
 def test_stub():
@@ -256,6 +257,17 @@ def evaluate_logistic_regression():
     lr = LogisticRegression(train_features, train_prediction_labels, test_features, test_prediction_labels)
 
     eval_metrics = EvaluationMetrics(lr, test_features, test_prediction_labels)
+    eval_metrics.evaluate()
+
+def evaluate_naive_bayes():
+    dh = DataHandler('data/train-set-feature-engineered.csv', 'prediction_label')
+    headers, train_features, train_prediction_labels = dh.get_numeric_data_set()
+
+    dh_test = DataHandler('data/test-set-feature-engineered.csv', 'prediction_label')
+    headers, test_features, test_prediction_labels = dh_test.get_numeric_data_set()
+
+    nb = NaiveBayes(train_features, train_prediction_labels, test_features, test_prediction_labels, headers)
+    eval_metrics = EvaluationMetrics(nb, test_features, test_prediction_labels)
     eval_metrics.evaluate()
 
 #evaluate_logistic_regression()
