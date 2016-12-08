@@ -3,7 +3,7 @@ from DataHandler import DataHandler
 from EvaluationMetrics import EvaluationMetrics
 from Bagging import Bagging
 from Svm import  Svm
-
+from LogisticRegression import LogisticRegression
 
 # Method to test basic KNN implementation with a dummy feature set and predictions set
 def test_stub():
@@ -225,7 +225,18 @@ def tune_bagged_knn_using_10_fold():
     average_accuracy = sum(accuracy) / len(accuracy)
     print average_accuracy
 
+def evaluate_logistic_regression():
+    dh = DataHandler('data/train-set-feature-engineered.csv', 'prediction_label')
+    headers, train_features, train_prediction_labels = dh.get_numeric_data_set()
 
+    dh_test = DataHandler('data/test-set-feature-engineered.csv', 'prediction_label')
+    headers, test_features, test_prediction_labels = dh_test.get_numeric_data_set()
+
+    print(len(test_prediction_labels))
+    lr = LogisticRegression(train_features, train_prediction_labels, test_features, test_prediction_labels)
+
+    eval_metrics = EvaluationMetrics(lr, test_features, test_prediction_labels)
+    eval_metrics.evaluate()
 
 
 #test_knn_on_review_data_set()
