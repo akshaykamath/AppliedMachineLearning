@@ -14,80 +14,116 @@ class Svm(object):
     C= None
     sv = []
 
-    def __init__(self, features, labels, C=None):
+    def __init__(self, features, labels, C=1, power=2, sigma = 1):
         self.features = list(features)
         self.labels = labels
         self.n_samples = len(self.features)
         self.n_features = len(self.features[0])
-        if self.C is not None: self.C = float(self.C)
-        # Remove:
-        self.p = 10
+        self.C= C
+
+        self.p = power
         self.sigma = 1
 
-    def kernel(self, x, y, k = 2):
+    def kernel(self, x, y, k = 0):
         if k == 0:
-            return (1 + np.dot(x, y)) ** self.p
+            return np.dot(x, y)
 
         elif k == 1:
-            return np.exp(-linalg.norm(x - y) ** 2 / (2 * (self.sigma ** 2)))
+            return (1 + np.dot(x, y)) ** self.p
 
         else: # Linear kernel
-            return np.dot(x,y)
+            return np.exp(-linalg.norm(x - y) ** 2 / (2 * (self.sigma ** 2)))
 
     def train(self):
         X = np.array(self.features)
         y = np.array(self.labels)
 
-        # Gram matrix
-        XiXj = np.zeros((self.n_samples, self.n_samples))
-        for i in range(self.n_samples):
-            for j in range(self.n_samples):
-                XiXj[i, j] = self.kernel(X[i],  X[j])
+        n_samples, n_features = X.shape
 
-        YiYj = np.outer(y, y)
-        XiXjYiYj = XiXj * YiYj
+        # Compute the double summation.
+        # Store the kernel computations
+        p_matrix = np.zeros((n_samples, n_samples))
+        XiXj = np.zeros((n_samples, n_samples))
+        for i in range(n_samples):
+            for j in range(n_samples):
+                xixj = self.kernel(X[i], X[j])
+                XiXj[i, j] = xixj
+                yiyj = y[i] * y[j]
+                p_matrix[i, j] = xixj * yiyj
 
-        P = cvxopt.matrix(XiXjYiYj)
-        q = cvxopt.matrix(np.ones(self.n_samples) * -1)
-        A = cvxopt.matrix(y, (1, self.n_samples))
+        # Compute the constraint that Summation(aiyi) = 0
+        a_matrix = []
+        for i in range(0, n_samples):
+            a_matrix.append([y[i]])
+
+        # Compute the q term i.e. summation(alphai)
+        q_matrix = [-1.0] * n_samples
+
+        # Create LHS matrix for constraint ai >= 0 and ai <=C
+        # Constraint 1: ai >= 0 do this for all n_samples
+        constraints = []
+        for i in range(0, n_samples):
+            constraint = [0.0] * n_samples
+            constraint[i] = -1.0
+            constraints.append(np.array(constraint))
+
+        if self.C != 0:
+            # Constraint 2: ai <= C
+            constraints2 = []
+            for i in range(0, n_samples):
+                constraint = [0.0] * n_samples
+                constraint[i] = 1.0
+                constraints2.append(np.array(constraint))
+
+            constraints.extend(constraints2)
+
+        constraint_lhs = np.array(constraints)
+
+        constraint_rhs = [0.0] * n_samples
+        if self.C != 0:
+            constraint_c = [1.0 * self.C] * n_samples
+            constraint_rhs.extend(constraint_c)
+
+        constraint_rhs = np.array(constraint_rhs)
+
+        P = cvxopt.matrix(p_matrix)
+        q = cvxopt.matrix(q_matrix)
+        A = cvxopt.matrix(a_matrix)
         b = cvxopt.matrix(0.0)
+        G = cvxopt.matrix(constraint_lhs)
+        h = cvxopt.matrix(constraint_rhs)
 
-        if self.C is None:
-            G = cvxopt.matrix(np.diag(np.ones(self.n_samples) * -1))
-            h = cvxopt.matrix(np.zeros(self.n_samples))
-        else:
-            tmp1 = np.diag(np.ones(self.n_samples) * -1)
-            tmp2 = np.identity(self.n_samples)
-            G = cvxopt.matrix(np.vstack((tmp1, tmp2)))
-            tmp1 = np.zeros(self.n_samples)
-            tmp2 = np.ones(self.n_samples) * self.C
-            h = cvxopt.matrix(np.hstack((tmp1, tmp2)))
-
-        # Solve the quadratic optimization
+        # Solve It!
         alpha_values = cvxopt.solvers.qp(P, q, G, h, A, b)
 
-        # get the alpha values
-        # a = np.ravel(alpha_values['x'])
-        a = np.ravel(alpha_values['x'])
+        # Get the alpha values
+        support_vecs = []
+        i = 0
+        for a in alpha_values['x']:
+            value = a if a > 1e-5 else 0
+            tup = (value, y[i], X[i], XiXj[i], i)
+            if value > 0:
+                support_vecs.append(tup)
 
-        # Support vectors have non zero lagrange multipliers
-        sv = a > 1e-5
-        ind = np.arange(len(a))[sv]
-        self.a = a[sv]
-        self.sv = X[sv]
-        self.sv_y = y[sv]
-        print("%d support vectors out of %d points" % (len(self.a), self.n_samples))
+            i+=1
 
-        # Intercept
         self.b = 0
-        for n in range(len(self.a)):
-            self.b += self.sv_y[n]
-            self.b -= np.sum(self.a * self.sv_y * XiXj[ind[n], sv])
-        self.b /= len(self.a)
+        alphas = np.array([vec[0] for vec in support_vecs])
+        svy = np.array([vec[1] for vec in support_vecs])
+        sv_indices = np.array([vec[4] for vec in support_vecs])
 
-        self.w = np.zeros(self.n_features)
-        for n in range(len(self.a)):
-            self.w += self.a[n] * self.sv_y[n] * self.sv[n]
+        for i in range(0, len(support_vecs)):
+            x = support_vecs[i][3]
+            x = [x[svi] for svi in sv_indices]
+
+            self.b += (y[i] - np.sum(alphas * svy * x))
+
+        self.b /= len(support_vecs)
+
+        self.w = [0.0] * n_features
+        for sv in support_vecs:
+            w = sv[0] * sv[1] * sv[2]
+            self.w += w
 
     def predict(self, X):
         value = np.dot(X, self.w) + self.b

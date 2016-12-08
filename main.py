@@ -141,8 +141,8 @@ def evaluate_svm():
     dh = DataHandler('data/train-set-feature-engineered.csv', 'prediction_label')
     headers, train_features, train_prediction_labels = dh.get_numeric_data_set()
 
-    svm = Svm(train_features, train_prediction_labels)
-    svm.train()
+    svm = Svm(train_features, train_prediction_labels, 1)
+    svm.train1()
 
     dh_test = DataHandler('data/test-set-feature-engineered.csv', 'prediction_label')
     headers, test_features, test_prediction_labels = dh_test.get_numeric_data_set()
@@ -225,6 +225,7 @@ def tune_bagged_knn_using_10_fold():
     average_accuracy = sum(accuracy) / len(accuracy)
     print average_accuracy
 
+
 def evaluate_logistic_regression():
     dh = DataHandler('data/train-set-feature-engineered.csv', 'prediction_label')
     headers, train_features, train_prediction_labels = dh.get_numeric_data_set()
@@ -238,7 +239,7 @@ def evaluate_logistic_regression():
     eval_metrics = EvaluationMetrics(lr, test_features, test_prediction_labels)
     eval_metrics.evaluate()
 
-
+#evaluate_logistic_regression()
 #test_knn_on_review_data_set()
 #data_text_stub()
 
@@ -249,7 +250,7 @@ def evaluate_logistic_regression():
 
 #evaluate_knn()
 #evaluate_bagged_knn()
-#evaluate_svm()
+evaluate_svm()
 
 #tune_svm_using_10_fold()
 #tune_knn_using_10_fold()
