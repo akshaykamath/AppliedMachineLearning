@@ -3,9 +3,15 @@ from nltk.stem.porter import PorterStemmer
 import csv
 from copy import deepcopy
 import math
-import numpy as np
 import codecs
 import sys
+from sklearn.datasets import load_iris
+from sklearn.feature_selection import SelectKBest
+from sklearn.feature_selection import chi2
+iris = load_iris()
+import  numpy as np
+
+
 reload(sys)
 sys.setdefaultencoding('utf8')
 
@@ -22,6 +28,24 @@ class DataHandler(object):
         self.data_set_file_name = data_set_file_name
         self.prediction_label = prediction_label
         self.cos_to_ignore = cols_to_ignore
+
+    def get_k_best_features(self, k, data_set, prediction_labels):
+        X = np.array(data_set)
+        y = np.array(prediction_labels)
+
+        kbest = SelectKBest(chi2, k=k)
+        X_new = kbest.fit_transform(X, y)
+
+        return X_new.tolist(), kbest.get_support()
+
+    def get_new_feature_vec(self, data_set, selected_features):
+
+        feature_selected_dataset = []
+        for feature_vec in data_set:
+            new_feature_vec = [item[0] for item in zip(feature_vec, selected_features) if item[1]]
+            feature_selected_dataset.append(new_feature_vec)
+
+        return feature_selected_dataset
 
     def get_numeric_data_set(self):
         csv_file = open(self.data_set_file_name, 'r')

@@ -10,6 +10,9 @@ def test_stub():
     #train _ features
     data_set = [(3, 2), (1,1), (4,4), (7,9), (11, 11)]
     prediction_labels = [1,-1,1,-1,1]
+    dh = DataHandler('data/total-test.csv', 'prediction_label')
+    data_set = dh.get_k_best_features(2, data_set, prediction_labels)
+
     knn = KNearestNeighbour(data_set, prediction_labels, 1)
 
     print knn.predict((0,0))
@@ -141,11 +144,17 @@ def evaluate_svm():
     dh = DataHandler('data/train-set-feature-engineered.csv', 'prediction_label')
     headers, train_features, train_prediction_labels = dh.get_numeric_data_set()
 
+    # Feature selection
+    train_features, selected_features = dh.get_k_best_features(500, train_features, train_prediction_labels)
+
     svm = Svm(train_features, train_prediction_labels, 0,1)
     svm.train()
 
     dh_test = DataHandler('data/test-set-feature-engineered.csv', 'prediction_label')
     headers, test_features, test_prediction_labels = dh_test.get_numeric_data_set()
+
+    # Feature selection
+    test_features = dh_test.get_new_feature_vec(test_features, selected_features)
 
     eval_metrics = EvaluationMetrics(svm, test_features, test_prediction_labels)
     eval_metrics.evaluate()
@@ -154,6 +163,9 @@ def evaluate_svm():
 def tune_svm_using_10_fold():
     dh = DataHandler('data/train-set-feature-engineered.csv', 'prediction_label')
     headers, train_features, train_prediction_labels = dh.get_numeric_data_set()
+    print "ssss ",len(train_features[0])
+
+    #train_features = dh.get_k_best_features(500, train_features, train_prediction_labels)
     data_sets = dh.get_cross_validation_data_sets(10, train_features, train_prediction_labels)
 
     accuracy = []
@@ -163,8 +175,15 @@ def tune_svm_using_10_fold():
         tuning_set = data_set[1]
         train_features = training_set["data_points"]
         train_prediction_labels = training_set["labels"]
+
+        # Feature selection
+        train_features, selected_features = dh.get_k_best_features(50, train_features, train_prediction_labels)
+
         test_features = tuning_set["data_points"]
         test_prediction_labels = tuning_set["labels"]
+
+        # Feature selection
+        test_features = dh.get_new_feature_vec(test_features, selected_features)
 
         svm = Svm(train_features, train_prediction_labels)
         svm.train()
@@ -250,8 +269,10 @@ def evaluate_logistic_regression():
 
 #evaluate_knn()
 #evaluate_bagged_knn()
-evaluate_svm()
+#evaluate_svm()
+#test_stub()
 
-#tune_svm_using_10_fold()
+
+tune_svm_using_10_fold()
 #tune_knn_using_10_fold()
 #tune_bagged_knn_using_10_fold()
