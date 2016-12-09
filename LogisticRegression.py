@@ -13,7 +13,7 @@ class LogisticRegression():
     weights = []
     weight_vector = []
 
-    def __init__(self, train_data, train_labels, test_data, test_labels, alpha=0.3):
+    def __init__(self, train_data, train_labels, test_data, test_labels, alpha):
         self.train_data = train_data
         # self.train_labels = train_labels
         self.train_labels = self.convert_labels(train_labels)
@@ -21,8 +21,8 @@ class LogisticRegression():
         # self.test_labels = test_labels
         self.test_labels = self.convert_labels(test_labels)
         self.feature_len = len(train_data[0])
-        self.perform_logistic_regression()
         self.alpha = alpha
+        self.perform_logistic_regression()
         # print(self.weight_vector)
         # self.printAccuracy()
 
@@ -83,7 +83,8 @@ class LogisticRegression():
             yhat = self.calculate_prediction(weight_vector, data_point)
 
             # calculate coefficients
-            intercept = (1.0,)
+            # intercept = (1.0,)
+            intercept = [1.0]
             weight_vector = self.calculate_coefficient(yhat, weight_vector, intercept + data_point, self.train_labels[idx])
             # print(weight_vector)
             self.weights.append(weight_vector)
