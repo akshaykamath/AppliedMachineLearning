@@ -288,7 +288,7 @@ def evaluate_logistic_regression():
     headers, test_features, test_prediction_labels = dh_test.get_numeric_data_set()
 
     print(len(test_prediction_labels))
-    lr = LogisticRegression(train_features, train_prediction_labels, test_features, test_prediction_labels)
+    lr = LogisticRegression(train_features, train_prediction_labels, test_features, test_prediction_labels, 0.3)
 
     eval_metrics = EvaluationMetrics(lr, test_features, test_prediction_labels)
     eval_metrics.evaluate()

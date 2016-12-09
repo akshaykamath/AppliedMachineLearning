@@ -8,12 +8,12 @@ class LogisticRegression():
     train_labels = None
     test_data = []
     test_labels = None
-    alpha = 0.3
+    alpha = None
     feature_len = None
     weights = []
     weight_vector = []
 
-    def __init__(self, train_data, train_labels, test_data, test_labels):
+    def __init__(self, train_data, train_labels, test_data, test_labels, alpha=0.3):
         self.train_data = train_data
         # self.train_labels = train_labels
         self.train_labels = self.convert_labels(train_labels)
@@ -22,7 +22,8 @@ class LogisticRegression():
         self.test_labels = self.convert_labels(test_labels)
         self.feature_len = len(train_data[0])
         self.perform_logistic_regression()
-        print(self.weight_vector)
+        self.alpha = alpha
+        # print(self.weight_vector)
         # self.printAccuracy()
 
     # assuming our data would have 1.0 for pos and -1.0 for neg
@@ -46,7 +47,7 @@ class LogisticRegression():
         res = weight[0]
         for idx, x in enumerate(data_point):
             res += float(weight[idx + 1]) * float(x)
-        print("without sigmoid {}".format(res))
+        # print("without sigmoid {}".format(res))
         yhat = self.sigmoid(res)
         return yhat
 
