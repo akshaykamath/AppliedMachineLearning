@@ -23,5 +23,5 @@ Similarly, the code to generate csv file from the xml data set can be found unde
 
 Then, from the command prompt invoke the following to run the program and generate the csv text based files.
 ```c
-  python main.py
+  python Main.py
 ```
