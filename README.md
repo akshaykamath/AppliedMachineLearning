@@ -18,3 +18,10 @@ Then, from the command prompt
 ```c
   python main.py
 ```
+
+Similarly, the code to generate csv file from the xml data set can be found under amazon_set/
+
+Then, from the command prompt invoke the following to run the program and generate the csv text based files.
+```c
+  python main.py
+```

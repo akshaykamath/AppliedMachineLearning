@@ -133,13 +133,15 @@ def evaluate_bagged_knn():
     dh = DataHandler('data/train-set-feature-engineered.csv', 'prediction_label')
     headers, train_features, train_prediction_labels = dh.get_numeric_data_set()
 
-    bagged_knn = Bagging(train_features, train_prediction_labels, 5, 1)
+    bagged_knn = Bagging(train_features, train_prediction_labels, 3, 1)
 
     dh_test = DataHandler('data/test-set-feature-engineered.csv', 'prediction_label')
     headers, test_features, test_prediction_labels = dh_test.get_numeric_data_set()
 
     eval_metrics = EvaluationMetrics(bagged_knn, test_features, test_prediction_labels)
-    eval_metrics.evaluate()
+    eval = eval_metrics.evaluate()
+    eval_metrics.compute_and_plot_auc(eval['predicted'], test_prediction_labels)
+    eval_metrics.compute_au_roc(eval['predicted'], test_prediction_labels)
 
 
 # This is the main method to evaluate knn on the data set.
@@ -319,7 +321,7 @@ def evaluate_naive_bayes():
 
 #evaluate_logistic_regression()
 #evaluate_knn()
-#evaluate_bagged_knn()
+evaluate_bagged_knn()
 #evaluate_svm()
 #evaluate_naive_bayes()
 
@@ -329,4 +331,4 @@ def evaluate_naive_bayes():
 #tune_lr_using_10_fold()
 #tune_svm_using_10_fold()
 #tune_knn_using_10_fold()
-tune_bagged_knn_using_10_fold()
+#tune_bagged_knn_using_10_fold()
