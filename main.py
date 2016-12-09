@@ -200,7 +200,6 @@ def tune_svm_using_10_fold():
     average_accuracy = sum(accuracy) / len(accuracy)
     print average_accuracy
 
-
 def tune_lr_using_10_fold():
     dh = DataHandler('data/train-set-feature-engineered.csv', 'prediction_label')
     headers, train_features, train_prediction_labels = dh.get_numeric_data_set()
@@ -321,14 +320,14 @@ def evaluate_naive_bayes():
 
 #evaluate_logistic_regression()
 #evaluate_knn()
-evaluate_bagged_knn()
+# evaluate_bagged_knn()
 #evaluate_svm()
 #evaluate_naive_bayes()
 
 
 
 #tune_nb_using_10_fold()
-#tune_lr_using_10_fold()
+tune_lr_using_10_fold()
 #tune_svm_using_10_fold()
 #tune_knn_using_10_fold()
 #tune_bagged_knn_using_10_fold()
