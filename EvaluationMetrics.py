@@ -61,9 +61,11 @@ class EvaluationMetrics(object):
 
             accuracy = (correct_classification / total_num)
             error = 1 - accuracy
+            precision = true_positive / (true_positive  + false_positive)
+            recall = true_positive / (true_positive + false_negative)
 
         result = {"accuracy": accuracy, "error": error, "TP": true_positive, "FN":false_negative,
-                  "TN":true_negative, "FP": false_positive, "predicted": predicted}
+                  "TN":true_negative, "FP": false_positive, "precision": precision, "recall": recall, "predicted": predicted}
 
         print result
 

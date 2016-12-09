@@ -164,7 +164,6 @@ def evaluate_svm():
 def tune_svm_using_10_fold():
     dh = DataHandler('data/train-set-feature-engineered.csv', 'prediction_label')
     headers, train_features, train_prediction_labels = dh.get_numeric_data_set()
-    print "ssss ",len(train_features[0])
 
     #train_features = dh.get_k_best_features(500, train_features, train_prediction_labels)
     data_sets = dh.get_cross_validation_data_sets(10, train_features, train_prediction_labels)
@@ -191,6 +190,41 @@ def tune_svm_using_10_fold():
         eval_metrics = EvaluationMetrics(svm, test_features, test_prediction_labels)
         eval = eval_metrics.evaluate()
         accuracy.append(eval['accuracy'])
+
+    average_accuracy = sum(accuracy) / len(accuracy)
+    print average_accuracy
+
+
+def tune_nb_using_10_fold():
+    dh = DataHandler('data/train-set-feature-engineered.csv', 'prediction_label')
+    headers, train_features, train_prediction_labels = dh.get_numeric_data_set()
+
+    #train_features = dh.get_k_best_features(len(train_features[0]), train_features, train_prediction_labels)
+    data_sets = dh.get_cross_validation_data_sets(10, train_features, train_prediction_labels)
+
+    accuracy = []
+    for data_set_number in data_sets:
+        data_set = data_sets.get(data_set_number)
+        training_set = data_set[0]
+        tuning_set = data_set[1]
+        train_features = training_set["data_points"]
+        train_prediction_labels = training_set["labels"]
+
+        # Feature selection
+        train_features, selected_features = dh.get_k_best_features(15000, train_features, train_prediction_labels)
+
+        test_features = tuning_set["data_points"]
+        test_prediction_labels = tuning_set["labels"]
+
+        # Feature selection
+        test_features = dh.get_new_feature_vec(test_features, selected_features)
+
+        nb = NaiveBayes(train_features, train_prediction_labels, test_features, test_prediction_labels, headers)
+
+        eval_metrics = EvaluationMetrics(nb, test_features, test_prediction_labels)
+        eval = eval_metrics.evaluate()
+        accuracy.append(eval['accuracy'])
+
 
     average_accuracy = sum(accuracy) / len(accuracy)
     print average_accuracy
@@ -263,7 +297,7 @@ def evaluate_logistic_regression():
 def evaluate_naive_bayes():
     dh = DataHandler('data/train-set-feature-engineered.csv', 'prediction_label')
     headers, train_features, train_prediction_labels = dh.get_numeric_data_set()
-
+    print len(train_features[0])
     dh_test = DataHandler('data/test-set-feature-engineered.csv', 'prediction_label')
     headers, test_features, test_prediction_labels = dh_test.get_numeric_data_set()
 
@@ -285,9 +319,10 @@ def evaluate_naive_bayes():
 #evaluate_knn()
 #evaluate_bagged_knn()
 #evaluate_svm()
-#test_stub()
-
 evaluate_naive_bayes()
+#test_stub()
+#tune_nb_using_10_fold()
+
 #tune_svm_using_10_fold()
 #tune_knn_using_10_fold()
 #tune_bagged_knn_using_10_fold()
