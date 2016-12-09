@@ -259,6 +259,7 @@ def evaluate_logistic_regression():
     eval_metrics = EvaluationMetrics(lr, test_features, test_prediction_labels)
     eval_metrics.evaluate()
 
+
 def evaluate_naive_bayes():
     dh = DataHandler('data/train-set-feature-engineered.csv', 'prediction_label')
     headers, train_features, train_prediction_labels = dh.get_numeric_data_set()
@@ -268,7 +269,9 @@ def evaluate_naive_bayes():
 
     nb = NaiveBayes(train_features, train_prediction_labels, test_features, test_prediction_labels, headers)
     eval_metrics = EvaluationMetrics(nb, test_features, test_prediction_labels)
-    eval_metrics.evaluate()
+    eval = eval_metrics.evaluate()
+    eval_metrics.compute_and_plot_auc(eval['predicted'], test_prediction_labels)
+    eval_metrics.compute_au_roc(eval['predicted'], test_prediction_labels)
 
 #evaluate_logistic_regression()
 #test_knn_on_review_data_set()
@@ -284,7 +287,7 @@ def evaluate_naive_bayes():
 #evaluate_svm()
 #test_stub()
 
-
-tune_svm_using_10_fold()
+evaluate_naive_bayes()
+#tune_svm_using_10_fold()
 #tune_knn_using_10_fold()
 #tune_bagged_knn_using_10_fold()
