@@ -117,7 +117,7 @@ def evaluate_knn():
     dh = DataHandler('data/train-set-feature-engineered.csv', 'prediction_label')
     headers, train_features, train_prediction_labels = dh.get_numeric_data_set()
 
-    knn = KNearestNeighbour(train_features, train_prediction_labels, 10)
+    knn = KNearestNeighbour(train_features, train_prediction_labels, 5)
 
     dh_test = DataHandler('data/test-set-feature-engineered.csv', 'prediction_label')
     headers, test_features, test_prediction_labels = dh_test.get_numeric_data_set()
@@ -249,7 +249,7 @@ def tune_knn_using_10_fold():
         test_features = tuning_set["data_points"]
         test_prediction_labels = tuning_set["labels"]
 
-        knn = KNearestNeighbour(train_features, train_prediction_labels, 7)
+        knn = KNearestNeighbour(train_features, train_prediction_labels, 11)
 
         eval_metrics = EvaluationMetrics(knn, test_features, test_prediction_labels)
         eval = eval_metrics.evaluate()
@@ -274,7 +274,7 @@ def tune_bagged_knn_using_10_fold():
         test_features = tuning_set["data_points"]
         test_prediction_labels = tuning_set["labels"]
 
-        bagged_knn = Bagging(train_features, train_prediction_labels, 5, 1)
+        bagged_knn = Bagging(train_features, train_prediction_labels, 4, 1)
 
         eval_metrics = EvaluationMetrics(bagged_knn, test_features, test_prediction_labels)
         eval = eval_metrics.evaluate()
@@ -314,23 +314,19 @@ def evaluate_naive_bayes():
     eval_metrics.compute_au_roc(eval['predicted'], test_prediction_labels)
 
 
+# data_write_train_stub()
+# data_write_test_stub()
+
 #evaluate_logistic_regression()
-#test_knn_on_review_data_set()
-#data_text_stub()
-
-#data_write_train_stub()
-#data_write_test_stub()
-
-#test_knn_on_review_data_set()
-
 #evaluate_knn()
 #evaluate_bagged_knn()
 #evaluate_svm()
 #evaluate_naive_bayes()
-#tune_lr_using_10_fold()
-#test_stub()
-#tune_nb_using_10_fold()
 
+
+
+#tune_nb_using_10_fold()
+#tune_lr_using_10_fold()
 #tune_svm_using_10_fold()
-tune_knn_using_10_fold()
-#tune_bagged_knn_using_10_fold()
+#tune_knn_using_10_fold()
+tune_bagged_knn_using_10_fold()
