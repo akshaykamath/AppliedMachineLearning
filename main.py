@@ -117,13 +117,15 @@ def evaluate_knn():
     dh = DataHandler('data/train-set-feature-engineered.csv', 'prediction_label')
     headers, train_features, train_prediction_labels = dh.get_numeric_data_set()
 
-    knn = KNearestNeighbour(train_features, train_prediction_labels, 5)
+    knn = KNearestNeighbour(train_features, train_prediction_labels, 10)
 
     dh_test = DataHandler('data/test-set-feature-engineered.csv', 'prediction_label')
     headers, test_features, test_prediction_labels = dh_test.get_numeric_data_set()
 
     eval_metrics = EvaluationMetrics(knn, test_features, test_prediction_labels)
-    eval_metrics.evaluate()
+    eval = eval_metrics.evaluate()
+    eval_metrics.compute_and_plot_auc(eval['predicted'], test_prediction_labels)
+    eval_metrics.compute_au_roc(eval['predicted'], test_prediction_labels)
 
 
 # This is the main method to evaluate knn on the data set.
@@ -146,9 +148,9 @@ def evaluate_svm():
     headers, train_features, train_prediction_labels = dh.get_numeric_data_set()
 
     # Feature selection
-    train_features, selected_features = dh.get_k_best_features(500, train_features, train_prediction_labels)
+    train_features, selected_features = dh.get_k_best_features(len(train_features[0]), train_features, train_prediction_labels)
 
-    svm = Svm(train_features, train_prediction_labels, 0,1)
+    svm = Svm(train_features, train_prediction_labels, 20, 0)
     svm.train()
 
     dh_test = DataHandler('data/test-set-feature-engineered.csv', 'prediction_label')
@@ -158,7 +160,9 @@ def evaluate_svm():
     test_features = dh_test.get_new_feature_vec(test_features, selected_features)
 
     eval_metrics = EvaluationMetrics(svm, test_features, test_prediction_labels)
-    eval_metrics.evaluate()
+    eval = eval_metrics.evaluate()
+    eval_metrics.compute_and_plot_auc(eval['predicted'], test_prediction_labels)
+    eval_metrics.compute_au_roc(eval['predicted'], test_prediction_labels)
 
 
 def tune_svm_using_10_fold():
@@ -177,7 +181,7 @@ def tune_svm_using_10_fold():
         train_prediction_labels = training_set["labels"]
 
         # Feature selection
-        train_features, selected_features = dh.get_k_best_features(50, train_features, train_prediction_labels)
+        train_features, selected_features = dh.get_k_best_features(len(train_features[0]), train_features, train_prediction_labels)
 
         test_features = tuning_set["data_points"]
         test_prediction_labels = tuning_set["labels"]
@@ -185,7 +189,7 @@ def tune_svm_using_10_fold():
         # Feature selection
         test_features = dh.get_new_feature_vec(test_features, selected_features)
 
-        svm = Svm(train_features, train_prediction_labels)
+        svm = Svm(train_features, train_prediction_labels, 200, 1, 2)
         svm.train()
         eval_metrics = EvaluationMetrics(svm, test_features, test_prediction_labels)
         eval = eval_metrics.evaluate()
@@ -245,7 +249,7 @@ def tune_knn_using_10_fold():
         test_features = tuning_set["data_points"]
         test_prediction_labels = tuning_set["labels"]
 
-        knn = KNearestNeighbour(train_features, train_prediction_labels, 100)
+        knn = KNearestNeighbour(train_features, train_prediction_labels, 7)
 
         eval_metrics = EvaluationMetrics(knn, test_features, test_prediction_labels)
         eval = eval_metrics.evaluate()
@@ -291,7 +295,9 @@ def evaluate_logistic_regression():
     lr = LogisticRegression(train_features, train_prediction_labels, test_features, test_prediction_labels, 0.3)
 
     eval_metrics = EvaluationMetrics(lr, test_features, test_prediction_labels)
-    eval_metrics.evaluate()
+    eval = eval_metrics.evaluate()
+    eval_metrics.compute_and_plot_auc(eval['predicted'], test_prediction_labels)
+    eval_metrics.compute_au_roc(eval['predicted'], test_prediction_labels)
 
 
 def evaluate_naive_bayes():
@@ -307,6 +313,7 @@ def evaluate_naive_bayes():
     eval_metrics.compute_and_plot_auc(eval['predicted'], test_prediction_labels)
     eval_metrics.compute_au_roc(eval['predicted'], test_prediction_labels)
 
+
 #evaluate_logistic_regression()
 #test_knn_on_review_data_set()
 #data_text_stub()
@@ -320,10 +327,10 @@ def evaluate_naive_bayes():
 #evaluate_bagged_knn()
 #evaluate_svm()
 #evaluate_naive_bayes()
-tune_lr_using_10_fold()
+#tune_lr_using_10_fold()
 #test_stub()
 #tune_nb_using_10_fold()
 
 #tune_svm_using_10_fold()
-#tune_knn_using_10_fold()
+tune_knn_using_10_fold()
 #tune_bagged_knn_using_10_fold()

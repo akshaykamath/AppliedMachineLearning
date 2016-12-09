@@ -83,8 +83,8 @@ class LogisticRegression():
             yhat = self.calculate_prediction(weight_vector, data_point)
 
             # calculate coefficients
-            # intercept = (1.0,)
-            intercept = [1.0]
+            intercept = (1.0,)
+            #intercept = [1.0]
             weight_vector = self.calculate_coefficient(yhat, weight_vector, intercept + data_point, self.train_labels[idx])
             # print(weight_vector)
             self.weights.append(weight_vector)
