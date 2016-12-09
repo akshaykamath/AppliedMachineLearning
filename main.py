@@ -195,7 +195,7 @@ def tune_svm_using_10_fold():
     print average_accuracy
 
 
-def tune_nb_using_10_fold():
+def tune_lr_using_10_fold():
     dh = DataHandler('data/train-set-feature-engineered.csv', 'prediction_label')
     headers, train_features, train_prediction_labels = dh.get_numeric_data_set()
 
@@ -211,7 +211,7 @@ def tune_nb_using_10_fold():
         train_prediction_labels = training_set["labels"]
 
         # Feature selection
-        train_features, selected_features = dh.get_k_best_features(15000, train_features, train_prediction_labels)
+        train_features, selected_features = dh.get_k_best_features(len(train_features[0]), train_features, train_prediction_labels)
 
         test_features = tuning_set["data_points"]
         test_prediction_labels = tuning_set["labels"]
@@ -219,9 +219,9 @@ def tune_nb_using_10_fold():
         # Feature selection
         test_features = dh.get_new_feature_vec(test_features, selected_features)
 
-        nb = NaiveBayes(train_features, train_prediction_labels, test_features, test_prediction_labels, headers)
+        lr = LogisticRegression(train_features, train_prediction_labels, test_features, test_prediction_labels, 0.3)
 
-        eval_metrics = EvaluationMetrics(nb, test_features, test_prediction_labels)
+        eval_metrics = EvaluationMetrics(lr, test_features, test_prediction_labels)
         eval = eval_metrics.evaluate()
         accuracy.append(eval['accuracy'])
 
@@ -319,7 +319,8 @@ def evaluate_naive_bayes():
 #evaluate_knn()
 #evaluate_bagged_knn()
 #evaluate_svm()
-evaluate_naive_bayes()
+#evaluate_naive_bayes()
+tune_lr_using_10_fold()
 #test_stub()
 #tune_nb_using_10_fold()
 
