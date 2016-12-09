@@ -1,5 +1,5 @@
 
-**HOW TO RUN CODE THE VARIOUS APPLIED MACHINE LEARNING ALGORITHMS**
+**HOW TO RUN THE IMPLEMENTED APPLIED MACHINE LEARNING ALGORITHMS**
 
 The file main.py is the main file from where all algorithms can be run. Simply uncomment/ comment the functions to see the results.
 The various functions are:
